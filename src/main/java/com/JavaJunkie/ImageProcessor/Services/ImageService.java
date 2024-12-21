@@ -30,25 +30,6 @@ public class ImageService{
     private GridFsTemplate gridFsTemplate;
 
     public String uploadImage(MultipartFile file) throws IOException {
-//        String filePath = "C:/uploads" + file.getOriginalFilename();
-//        File uploadDir = new File("uploads/");
-//        if (!uploadDir.exists()) {
-//            uploadDir.mkdirs();
-//        }
-//        file.transferTo(new java.io.File(filePath));
-//        ImageEntity image = new ImageEntity();
-//        image.setName(file.getOriginalFilename());
-//        image.setContentType(file.getContentType());
-//        image.setImageData(file.getBytes());
-//        imageRepository.save(image);
-//
-////        return filePath;
-//
-//        InputStream inputStream = file.getInputStream(); // Read file content as InputStream
-//
-//        ObjectId fileId = gridFsTemplate.store(inputStream, file.getOriginalFilename(), file.getContentType());
-//
-//        return fileId.toString();
 
         ImageEntity image = new ImageEntity();
         image.setName(file.getOriginalFilename());

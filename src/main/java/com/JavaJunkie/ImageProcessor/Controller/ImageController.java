@@ -40,7 +40,7 @@ public class ImageController {
         ImageEntity metadata = imageService.getImageMetadataById(id);
 
         return ResponseEntity.ok()
-                .contentType(MediaType.valueOf(metadata.getContentType())) // Set content type dynamically
+                .contentType(MediaType.valueOf(metadata.getContentType()))
                 .body(imageData);
     }
     @GetMapping("/getMetadata/{id}")
