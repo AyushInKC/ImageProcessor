@@ -1,8 +1,10 @@
 package com.JavaJunkie.ImageProcessor.Controller;
 
+import com.JavaJunkie.ImageProcessor.DTO.ResizeRequest;
 import com.JavaJunkie.ImageProcessor.Entity.ImageEntity;
 import com.JavaJunkie.ImageProcessor.Respository.ImageRepository;
 import com.JavaJunkie.ImageProcessor.Services.ImageService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -36,10 +38,7 @@ public class ImageController {
     @GetMapping("getImg/{id}")
     public ResponseEntity<byte[]> getImage(@PathVariable String id) {
         byte[] imageData = imageService.getImageById(id);
-
-
         ImageEntity metadata = imageService.getImageMetadataById(id);
-
         return ResponseEntity.ok()
                 .contentType(MediaType.valueOf(metadata.getContentType()))
                 .body(imageData);
@@ -81,5 +80,19 @@ public class ImageController {
     public ResponseEntity<List<ImageEntity>> listImages(){
     List<ImageEntity> images=imageService.getAllImages();
     return ResponseEntity.ok(images);
+    }
+
+
+    @PostMapping(value = "/resizeImg", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String>resizeImage(@RequestPart("file") MultipartFile file,   @RequestParam("width") int width,       // Width as query param
+                                             @RequestParam("height") int height){
+        try {
+            String fileId = imageService.resizeImage(file,width,height);
+            return ResponseEntity.ok("Resized image uploaded successfully: " + fileId);
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to resize image: " + e.getMessage());
+        }
     }
 }

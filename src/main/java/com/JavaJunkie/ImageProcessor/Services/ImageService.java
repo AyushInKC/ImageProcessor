@@ -1,26 +1,25 @@
 package com.JavaJunkie.ImageProcessor.Services;
+import com.JavaJunkie.ImageProcessor.DTO.ResizeRequest;
 import com.JavaJunkie.ImageProcessor.Entity.ImageEntity;
 import com.JavaJunkie.ImageProcessor.Respository.ImageRepository;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
+import net.coobird.thumbnailator.Thumbnails;
 import org.bson.types.ObjectId;
+import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.*;
-import java.io.File;
-import java.io.IOException;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.util.*;
+import java.io.IOException;
 import java.util.Optional;
-import java.util.Properties;
 
 @Component
 @Service
@@ -94,4 +93,34 @@ public class ImageService{
           }
           return false;
     }
+
+    public String resizeImage(MultipartFile file, int width, int height) throws IOException {
+        if (width <= 0 || height <= 0) {
+            throw new IllegalArgumentException("Width and height must be positive integers.");
+        }
+
+        System.out.println("Resizing image: " + file.getOriginalFilename() + " to width: " + width + " and height: " + height);
+
+        InputStream inputStream = file.getInputStream();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        Thumbnails.of(inputStream)
+                .size(width, height)
+                .outputFormat("png")
+                .toOutputStream(outputStream);
+
+        byte[] resizedImageBytes = outputStream.toByteArray();
+        System.out.println("Resized image size: " + resizedImageBytes.length);
+
+        ImageEntity resizedImage = new ImageEntity();
+        resizedImage.setName(file.getOriginalFilename());
+        resizedImage.setContentType("image/png");
+        resizedImage.setImageData(resizedImageBytes);
+
+        ImageEntity savedImage = imageRepository.save(resizedImage);
+        System.out.println("Image saved with ID: " + savedImage.getId());
+
+        return savedImage.getId();
+    }
+
 }
