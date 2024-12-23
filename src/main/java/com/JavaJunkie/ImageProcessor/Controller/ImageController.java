@@ -1,10 +1,8 @@
 package com.JavaJunkie.ImageProcessor.Controller;
 
-import com.JavaJunkie.ImageProcessor.DTO.ResizeRequest;
 import com.JavaJunkie.ImageProcessor.Entity.ImageEntity;
 import com.JavaJunkie.ImageProcessor.Respository.ImageRepository;
 import com.JavaJunkie.ImageProcessor.Services.ImageService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,7 +13,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/img/")
@@ -75,20 +72,17 @@ public class ImageController {
             return ResponseEntity.internalServerError().body("Error updating image: " + e.getMessage());
         }
     }
-
     @GetMapping("/listAll")
     public ResponseEntity<List<ImageEntity>> listImages(){
     List<ImageEntity> images=imageService.getAllImages();
     return ResponseEntity.ok(images);
     }
-
-
     @PostMapping(value = "/resizeImg", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String>resizeImage(@RequestPart("file") MultipartFile file,   @RequestParam("width") int width,       // Width as query param
-                                             @RequestParam("height") int height){
+    public ResponseEntity<byte[]> resizeImage(@RequestParam("file") MultipartFile file,
+                                              @RequestParam("width") int width,
+                                              @RequestParam("height") int height) {
         try {
-            String fileId = imageService.resizeImage(file,width,height);
-            return ResponseEntity.ok("Resized image uploaded successfully: " + fileId);
+            return imageService.resizeImage(file, width, height);
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         } catch (IOException e) {

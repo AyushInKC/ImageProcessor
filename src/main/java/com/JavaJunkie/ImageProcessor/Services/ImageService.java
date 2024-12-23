@@ -1,19 +1,18 @@
 package com.JavaJunkie.ImageProcessor.Services;
-import com.JavaJunkie.ImageProcessor.DTO.ResizeRequest;
 import com.JavaJunkie.ImageProcessor.Entity.ImageEntity;
 import com.JavaJunkie.ImageProcessor.Respository.ImageRepository;
 import net.coobird.thumbnailator.Thumbnails;
-import org.bson.types.ObjectId;
-import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -94,33 +93,34 @@ public class ImageService{
           return false;
     }
 
-    public String resizeImage(MultipartFile file, int width, int height) throws IOException {
+    public ResponseEntity<byte[]> resizeImage(MultipartFile file, int width, int height) throws IOException {
         if (width <= 0 || height <= 0) {
             throw new IllegalArgumentException("Width and height must be positive integers.");
         }
 
-        System.out.println("Resizing image: " + file.getOriginalFilename() + " to width: " + width + " and height: " + height);
-
         InputStream inputStream = file.getInputStream();
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
+        // Resize the image and set the output format
         Thumbnails.of(inputStream)
-                .size(width, height)
-                .outputFormat("png")
-                .toOutputStream(outputStream);
+                .size(width, height)  // Set the resize dimensions
+                .outputFormat("png")  // Specify output format
+                .toOutputStream(outputStream);  // Write to the output stream
+
+        // Verify the dimensions after resizing
+        BufferedImage bufferedImage = Thumbnails.of(new ByteArrayInputStream(outputStream.toByteArray()))
+                .size(width, height)  // Ensure that the size is set after resizing
+                .asBufferedImage();
+
+        System.out.println("Resized width: " + bufferedImage.getWidth() + ", Resized height: " + bufferedImage.getHeight());
 
         byte[] resizedImageBytes = outputStream.toByteArray();
-        System.out.println("Resized image size: " + resizedImageBytes.length);
 
-        ImageEntity resizedImage = new ImageEntity();
-        resizedImage.setName(file.getOriginalFilename());
-        resizedImage.setContentType("image/png");
-        resizedImage.setImageData(resizedImageBytes);
-
-        ImageEntity savedImage = imageRepository.save(resizedImage);
-        System.out.println("Image saved with ID: " + savedImage.getId());
-
-        return savedImage.getId();
+        // Return the resized image as a byte array in the response
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_PNG)  // Set correct content type (PNG in this case)
+                .body(resizedImageBytes); // Send resized image to the client
     }
+
 
 }
