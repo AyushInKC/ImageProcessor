@@ -2,6 +2,8 @@ package com.JavaJunkie.ImageProcessor.Services;
 import com.JavaJunkie.ImageProcessor.Entity.ImageEntity;
 import com.JavaJunkie.ImageProcessor.Respository.ImageRepository;
 import net.coobird.thumbnailator.Thumbnails;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.http.HttpStatus;
@@ -12,12 +14,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.*;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -28,20 +33,18 @@ public class ImageService{
 
     @Autowired
     private GridFsTemplate gridFsTemplate;
+    private static final Logger logger = LoggerFactory.getLogger(ImageService.class);
 
     public String uploadImage(MultipartFile file) throws IOException {
-
         ImageEntity image = new ImageEntity();
         image.setName(file.getOriginalFilename());
         image.setContentType(file.getContentType());
         image.setImageData(file.getBytes());
-
         ImageEntity savedImage = imageRepository.save(image);
         return savedImage.getId();
     }
     public byte[] getImageById(String id){
         Optional<ImageEntity> imageOptional = imageRepository.findById(id);
-
         if (imageOptional.isPresent()) {
             return imageOptional.get().getImageData();
         } else {
@@ -52,7 +55,6 @@ public class ImageService{
         return imageRepository.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Image not found"));
     }
-
 
     public void deleteImage(String id){
          if(imageRepository.existsById(id)){
@@ -101,26 +103,38 @@ public class ImageService{
         InputStream inputStream = file.getInputStream();
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-        // Resize the image and set the output format
         Thumbnails.of(inputStream)
-                .size(width, height)  // Set the resize dimensions
-                .outputFormat("png")  // Specify output format
-                .toOutputStream(outputStream);  // Write to the output stream
-
-        // Verify the dimensions after resizing
+                .size(width, height)
+                .outputFormat("png")
+                .toOutputStream(outputStream);
         BufferedImage bufferedImage = Thumbnails.of(new ByteArrayInputStream(outputStream.toByteArray()))
-                .size(width, height)  // Ensure that the size is set after resizing
+                .size(width, height)
                 .asBufferedImage();
 
-        System.out.println("Resized width: " + bufferedImage.getWidth() + ", Resized height: " + bufferedImage.getHeight());
+        System.out.println("Resized width: " + bufferedImage.getWidth() + " , Resized height: " + bufferedImage.getHeight());
 
         byte[] resizedImageBytes = outputStream.toByteArray();
 
-        // Return the resized image as a byte array in the response
         return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_PNG)  // Set correct content type (PNG in this case)
-                .body(resizedImageBytes); // Send resized image to the client
+                .contentType(MediaType.IMAGE_PNG)
+                .body(resizedImageBytes);
     }
 
+    public byte[] rotateImage(MultipartFile file, double angle) throws IOException{
+        BufferedImage originalImage = ImageIO.read(file.getInputStream());
 
+        int width = originalImage.getWidth();
+        int height = originalImage.getHeight();
+
+        BufferedImage rotatedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics2D = rotatedImage.createGraphics();
+
+        graphics2D.rotate(Math.toRadians(angle), width / 2, height / 2);
+        graphics2D.drawImage(originalImage, 0, 0, null);
+        graphics2D.dispose();
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(rotatedImage, "PNG", baos);
+        return baos.toByteArray();
+}
 }

@@ -34,14 +34,12 @@
 //        userEntity.setPassword(userRequestDTO.getPassword());
 //        return userRepository.save(userEntity);
 //    }
-//
-//
 //    public UserLoginResponseDTO loginUser(UserLoginRequestDTO userLoginRequestDTO){
 //        Optional<UserEntity>  user= userRepository.findByUsername(userLoginRequestDTO.getUsername());
 //
 //        if(user.isPresent()){
-//
 //        }
 //        return null;
 //    }
 //}
+

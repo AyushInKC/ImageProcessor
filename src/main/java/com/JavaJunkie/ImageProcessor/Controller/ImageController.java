@@ -1,19 +1,17 @@
 package com.JavaJunkie.ImageProcessor.Controller;
-
 import com.JavaJunkie.ImageProcessor.Entity.ImageEntity;
 import com.JavaJunkie.ImageProcessor.Respository.ImageRepository;
 import com.JavaJunkie.ImageProcessor.Services.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.io.IOException;
 import java.util.List;
-
 @RestController
 @RequestMapping("/img/")
 public class ImageController {
@@ -88,5 +86,13 @@ public class ImageController {
         } catch (IOException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to resize image: " + e.getMessage());
         }
+    }
+
+    @PostMapping("/rotateImg")
+    public ResponseEntity<byte[]> rotateImage(@RequestParam("file") MultipartFile file,@RequestParam("angle") double angle) throws IOException {
+        byte[] rotatedImage = imageService.rotateImage(file, angle);
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", "image/png");
+        return new ResponseEntity<>(rotatedImage, headers, HttpStatus.OK);
     }
 }
