@@ -95,4 +95,12 @@ public class ImageController {
         headers.set("Content-Type", "image/png");
         return new ResponseEntity<>(rotatedImage, headers, HttpStatus.OK);
     }
+
+    @PostMapping("/cropImg")
+    public ResponseEntity<byte[]> cropImage(@RequestParam("file") MultipartFile file,@RequestParam("x") int x,@RequestParam("x") int y,@RequestParam("height") int height,@RequestParam("width") int width) throws IOException {
+        byte[] croppedImage = imageService.cropImage(file, x, y, height, width);
+       return  ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_PNG)
+                .body(croppedImage);
+    }
 }

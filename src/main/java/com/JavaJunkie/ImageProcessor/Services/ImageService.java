@@ -82,7 +82,6 @@ public class ImageService{
     public List<ImageEntity> getAllImages() {
         return imageRepository.findAll();
     }
-
     public boolean updateImageFile(String id, MultipartFile file) throws IOException {
           ImageEntity existingImage=imageRepository.findById(id).orElse(null);
           if(existingImage!=null){
@@ -101,6 +100,7 @@ public class ImageService{
         }
 
         InputStream inputStream = file.getInputStream();
+
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
         Thumbnails.of(inputStream)
@@ -114,21 +114,16 @@ public class ImageService{
         System.out.println("Resized width: " + bufferedImage.getWidth() + " , Resized height: " + bufferedImage.getHeight());
 
         byte[] resizedImageBytes = outputStream.toByteArray();
-
         return ResponseEntity.ok()
                 .contentType(MediaType.IMAGE_PNG)
                 .body(resizedImageBytes);
     }
-
     public byte[] rotateImage(MultipartFile file, double angle) throws IOException{
         BufferedImage originalImage = ImageIO.read(file.getInputStream());
-
         int width = originalImage.getWidth();
         int height = originalImage.getHeight();
-
         BufferedImage rotatedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D graphics2D = rotatedImage.createGraphics();
-
         graphics2D.rotate(Math.toRadians(angle), width / 2, height / 2);
         graphics2D.drawImage(originalImage, 0, 0, null);
         graphics2D.dispose();
@@ -136,5 +131,17 @@ public class ImageService{
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ImageIO.write(rotatedImage, "PNG", baos);
         return baos.toByteArray();
+}
+
+public byte[] cropImage(MultipartFile file,int x,int y,int height,int width) throws IOException {
+    BufferedImage originalImage = ImageIO.read(file.getInputStream());
+
+    BufferedImage croppedImage = originalImage.getSubimage(x, y, width, height);
+
+    System.out.println("Cropped Image Size: " + croppedImage.getWidth() + "x" + croppedImage.getHeight());
+
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    ImageIO.write(croppedImage, "PNG", baos);
+    return baos.toByteArray();
 }
 }
