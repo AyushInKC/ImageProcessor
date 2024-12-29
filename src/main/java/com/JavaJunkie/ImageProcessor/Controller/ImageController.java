@@ -103,4 +103,66 @@ public class ImageController {
                 .contentType(MediaType.IMAGE_PNG)
                 .body(croppedImage);
     }
+
+    @PostMapping("/addWaterMark")
+    public ResponseEntity<byte[]> addWaterMark(@RequestParam("file") MultipartFile file,@RequestParam("title") String title){
+        byte[] waterMarkedImage=imageService.addWaterMark(file,title);
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_PNG)
+                .body(waterMarkedImage);
+    }
+
+
+    @PostMapping("/convertToJPG")
+    public ResponseEntity<byte[]> convertToJPG(@RequestParam("file") MultipartFile file){
+        byte[] JPGImg=imageService.convertToJPG(file);
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_JPEG)
+                .body(JPGImg);
+    }
+
+    @PostMapping("/convertImageToPDF")
+    public ResponseEntity<byte[]> convertImageToPDF(MultipartFile file) throws IOException {
+        byte[] pdfBytes = imageService.convertImageToPDF(file);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "inline; filename=image.pdf");
+        headers.add("Content-Type", "application/pdf");
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(pdfBytes);
+    }
+
+    @PostMapping("/addGrayScaleFilter")
+    public ResponseEntity<byte[]> addGrayScaleFilter(MultipartFile file) throws IOException {
+        byte [] filteredImg=imageService.addGrayScaleFilter(file);
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_JPEG)
+                .body(filteredImg);
+    }
+
+    @PostMapping("/addSepiaFilter")
+    public ResponseEntity<byte[]> addSepiaFilter(MultipartFile file) throws IOException {
+        byte [] filteredImg=imageService.addSepiaFilter(file);
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_JPEG)
+                .body(filteredImg);
+    }
+
+    @PostMapping("/mirrorImage")
+    public ResponseEntity<byte[]> mirrorImage(@RequestParam("file") MultipartFile file,@RequestParam("direction") String direction) throws IOException{
+        byte[] mirroredImg = imageService.mirrorImage(file, direction);
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_JPEG)
+                .body(mirroredImg);
+    }
+
+    @PostMapping("/compressImage")
+    public ResponseEntity<byte[]> compressImage(@RequestParam("file") MultipartFile file,@RequestParam("size") float size) throws IOException {
+        byte[] compressedImg = imageService.compressImage(file,size);
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_JPEG)
+                .body(compressedImg);
+    }
+
 }
+
