@@ -164,5 +164,13 @@ public class ImageController {
                 .body(compressedImg);
     }
 
+    @PostMapping("/blurImage")
+    public ResponseEntity<byte[]> blurImage(@RequestParam("file") MultipartFile file) throws IOException{
+        byte[] blurredImage=imageService.blurImage(file);
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_PNG)
+                .body(blurredImage);
+    }
+
 }
 

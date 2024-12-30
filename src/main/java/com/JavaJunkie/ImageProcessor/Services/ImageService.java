@@ -23,6 +23,8 @@ import javax.imageio.ImageWriter;
 import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.ConvolveOp;
+import java.awt.image.Kernel;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -304,5 +306,35 @@ public byte[] cropImage(MultipartFile file,int x,int y,int height,int width) thr
         writer.dispose();
 
         return byteArrayOutputStream.toByteArray();
+    }
+
+    public byte[] blurImage(MultipartFile file) throws IOException{
+        BufferedImage originalImage = ImageIO.read(new ByteArrayInputStream(file.getBytes()));
+        float[] blurKernel = {
+                1f / 4096f, 4f / 4096f, 7f / 4096f, 10f / 4096f, 11f / 4096f, 10f / 4096f, 7f / 4096f, 4f / 4096f, 1f / 4096f,
+                4f / 4096f, 16f / 4096f, 26f / 4096f, 40f / 4096f, 44f / 4096f, 40f / 4096f, 26f / 4096f, 16f / 4096f, 4f / 4096f,
+                7f / 4096f, 26f / 4096f, 41f / 4096f, 62f / 4096f, 68f / 4096f, 62f / 4096f, 41f / 4096f, 26f / 4096f, 7f / 4096f,
+                10f / 4096f, 40f / 4096f, 62f / 4096f, 93f / 4096f, 101f / 4096f, 93f / 4096f, 62f / 4096f, 40f / 4096f, 10f / 4096f,
+                11f / 4096f, 44f / 4096f, 68f / 4096f, 101f / 4096f, 109f / 4096f, 101f / 4096f, 68f / 4096f, 44f / 4096f, 11f / 4096f,
+                10f / 4096f, 40f / 4096f, 62f / 4096f, 93f / 4096f, 101f / 4096f, 93f / 4096f, 62f / 4096f, 40f / 4096f, 10f / 4096f,
+                7f / 4096f, 26f / 4096f, 41f / 4096f, 62f / 4096f, 68f / 4096f, 62f / 4096f, 41f / 4096f, 26f / 4096f, 7f / 4096f,
+                4f / 4096f, 16f / 4096f, 26f / 4096f, 40f / 4096f, 44f / 4096f, 40f / 4096f, 26f / 4096f, 16f / 4096f, 4f / 4096f,
+                1f / 4096f, 4f / 4096f, 7f / 4096f, 10f / 4096f, 11f / 4096f, 10f / 4096f, 7f / 4096f, 4f / 4096f, 1f / 4096f
+        };
+
+        Kernel kernel = new Kernel(7, 7, blurKernel);
+        ConvolveOp convolveOp = new ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null);
+
+        BufferedImage blurredImage = new BufferedImage(
+                originalImage.getWidth(),
+                originalImage.getHeight(),
+                BufferedImage.TYPE_INT_ARGB
+        );
+        convolveOp.filter(originalImage, blurredImage);
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ImageIO.write(blurredImage, "png", outputStream);
+
+        return outputStream.toByteArray();
     }
 }
