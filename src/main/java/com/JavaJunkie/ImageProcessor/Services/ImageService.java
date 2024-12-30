@@ -311,18 +311,14 @@ public byte[] cropImage(MultipartFile file,int x,int y,int height,int width) thr
     public byte[] blurImage(MultipartFile file) throws IOException{
         BufferedImage originalImage = ImageIO.read(new ByteArrayInputStream(file.getBytes()));
         float[] blurKernel = {
-                1f / 4096f, 4f / 4096f, 7f / 4096f, 10f / 4096f, 11f / 4096f, 10f / 4096f, 7f / 4096f, 4f / 4096f, 1f / 4096f,
-                4f / 4096f, 16f / 4096f, 26f / 4096f, 40f / 4096f, 44f / 4096f, 40f / 4096f, 26f / 4096f, 16f / 4096f, 4f / 4096f,
-                7f / 4096f, 26f / 4096f, 41f / 4096f, 62f / 4096f, 68f / 4096f, 62f / 4096f, 41f / 4096f, 26f / 4096f, 7f / 4096f,
-                10f / 4096f, 40f / 4096f, 62f / 4096f, 93f / 4096f, 101f / 4096f, 93f / 4096f, 62f / 4096f, 40f / 4096f, 10f / 4096f,
-                11f / 4096f, 44f / 4096f, 68f / 4096f, 101f / 4096f, 109f / 4096f, 101f / 4096f, 68f / 4096f, 44f / 4096f, 11f / 4096f,
-                10f / 4096f, 40f / 4096f, 62f / 4096f, 93f / 4096f, 101f / 4096f, 93f / 4096f, 62f / 4096f, 40f / 4096f, 10f / 4096f,
-                7f / 4096f, 26f / 4096f, 41f / 4096f, 62f / 4096f, 68f / 4096f, 62f / 4096f, 41f / 4096f, 26f / 4096f, 7f / 4096f,
-                4f / 4096f, 16f / 4096f, 26f / 4096f, 40f / 4096f, 44f / 4096f, 40f / 4096f, 26f / 4096f, 16f / 4096f, 4f / 4096f,
-                1f / 4096f, 4f / 4096f, 7f / 4096f, 10f / 4096f, 11f / 4096f, 10f / 4096f, 7f / 4096f, 4f / 4096f, 1f / 4096f
+                1f / 256f, 4f / 256f, 6f / 256f, 4f / 256f, 1f / 256f,
+                4f / 256f, 16f / 256f, 24f / 256f, 16f / 256f, 4f / 256f,
+                6f / 256f, 24f / 256f, 36f / 256f, 24f / 256f, 6f / 256f,
+                4f / 256f, 16f / 256f, 24f / 256f, 16f / 256f, 4f / 256f,
+                1f / 256f, 4f / 256f, 6f / 256f, 4f / 256f, 1f / 256f
         };
 
-        Kernel kernel = new Kernel(7, 7, blurKernel);
+        Kernel kernel = new Kernel(5, 5, blurKernel);
         ConvolveOp convolveOp = new ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null);
 
         BufferedImage blurredImage = new BufferedImage(
