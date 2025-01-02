@@ -5,6 +5,7 @@ import com.JavaJunkie.ImageProcessor.DTO.UserRegisterRequestDTO;
 import com.JavaJunkie.ImageProcessor.Entity.UserEntity;
 import com.JavaJunkie.ImageProcessor.Respository.UserRepository;
 import com.JavaJunkie.ImageProcessor.Services.UserService;
+import com.JavaJunkie.ImageProcessor.Utils.JWTUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,18 +29,20 @@ public class UserController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private JWTUtility jwtUtility;
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody UserRegisterRequestDTO userRegisterRequestDTO) {
         try {
+            if (userService.usernameExists(userRegisterRequestDTO.getUsername())) {
+                return new ResponseEntity<>("Username already registered!", HttpStatus.CONFLICT);
+            }
             userRegisterRequestDTO.setPassword(passwordEncoder.encode(userRegisterRequestDTO.getPassword()));
             UserEntity createdUser = userService.registerUser(userRegisterRequestDTO);
 
             log.info("User created successfully: {}", createdUser);
             return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
-        } catch (DataIntegrityViolationException e) {
-            log.error("User registration failed - Duplicate entry: {}", e.getMessage());
-            return new ResponseEntity<>("Username already registered!", HttpStatus.CONFLICT);
         } catch (Exception e) {
             log.error("User registration failed: {}", e.getMessage());
             return new ResponseEntity<>("Registration failed due to an error.", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -47,17 +50,16 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody UserLoginDTO userLoginDTO){
+    public ResponseEntity<?> loginUser(@RequestBody UserLoginDTO userLoginDTO) {
         try {
             String loginResponse = userService.loginUser(userLoginDTO);
-            if (loginResponse.equals("Login successful!")) {
-                return new ResponseEntity<>(loginResponse, HttpStatus.OK);
+            if (loginResponse.contains("Login successful")) {
+                return ResponseEntity.ok(loginResponse);
             } else {
-                return new ResponseEntity<>(loginResponse, HttpStatus.UNAUTHORIZED);
+                return ResponseEntity.status(401).body(loginResponse);
             }
-        }
-        catch (Exception e){
-            return new ResponseEntity<>("Login failed due to an error.", HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Login failed due to an error.");
         }
     }
 }

@@ -65,6 +65,23 @@
 			<version>1.18.30</version> <!-- Latest version -->
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-api</artifactId>
+			<version>0.11.5</version>  <!-- Use the latest version -->
+		</dependency>
+
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-impl</artifactId>
+			<version>0.11.5</version>  <!-- Use the latest version -->
+		</dependency>
+
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-jackson</artifactId>
+			<version>0.11.5</version>  <!-- Use the latest version -->
+		</dependency>
 <!--		<dependency>-->
 <!--			<groupId>org.projectlombok</groupId>-->
 <!--			<artifactId>lombok</artifactId>-->

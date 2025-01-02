@@ -133,7 +133,7 @@ public class ImageController {
     }
 
     @PostMapping("/addGrayScaleFilter")
-    public ResponseEntity<byte[]> addGrayScaleFilter(MultipartFile file) throws IOException {
+    public ResponseEntity<byte[]> addGrayScaleFilter(@RequestParam("file") MultipartFile file) throws IOException {
         byte [] filteredImg=imageService.addGrayScaleFilter(file);
         return ResponseEntity.ok()
                 .contentType(MediaType.IMAGE_JPEG)
