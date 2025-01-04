@@ -172,5 +172,13 @@ public class ImageController {
                 .body(blurredImage);
     }
 
+    @PostMapping("/tintImage")
+
+    public ResponseEntity<byte[]> tintImage(@RequestParam("file") MultipartFile file ,@RequestParam("r") String red,
+                                           @RequestParam("g") String green,@RequestParam("b") String blue){
+        byte[] tintedImage= imageService.tintImage(file,red,green,blue);
+        return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(tintedImage);
+    }
+
 }
 
