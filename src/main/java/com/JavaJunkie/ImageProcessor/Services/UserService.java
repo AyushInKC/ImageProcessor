@@ -45,16 +45,15 @@ public class UserService {
                 return "Invalid password!";
             }
 
-            System.out.println("User logged in successfully: " + user.getUsername());
-
             String accessToken = jwtUtility.generateAccessToken(user.getUsername());
             String refreshToken = jwtUtility.generateRefreshToken(user.getUsername());
 
-            return "Login successful! Access Token: " + accessToken + " Refresh Token: " + refreshToken;
+            return "Login successful! \n Access Token: "+accessToken + " \nRefresh Token: " + refreshToken;
         } catch (Exception e) {
             e.printStackTrace();
             return "Login failed due to an error.";
         }
     }
+
 
 }

@@ -58,4 +58,8 @@ public class JWTUtility {
         Date expiration = extractClaims(token).getExpiration();
         return expiration.before(new Date());
     }
+
+    public SecretKey getSecretKey() {
+        return SECRET_KEY;
+    }
 }

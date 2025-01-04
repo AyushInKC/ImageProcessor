@@ -20,7 +20,6 @@ public class ImageController {
     @Autowired
     private ImageRepository imageRepository;
     @PostMapping("/uploadImg")
-
     public ResponseEntity<?> uploadImage(@RequestParam("file") MultipartFile file) throws IOException {
         try {
             String fileId = imageService.uploadImage(file);
@@ -29,7 +28,6 @@ public class ImageController {
             return ResponseEntity.status(500).body("Error uploading file");
         }
     }
-
     @GetMapping("getImg/{id}")
     public ResponseEntity<byte[]> getImage(@PathVariable String id) {
         byte[] imageData = imageService.getImageById(id);
@@ -43,7 +41,6 @@ public class ImageController {
         ImageEntity metadata = imageService.getImageMetadataById(id);
         return ResponseEntity.ok(metadata);
     }
-
     @DeleteMapping("/deleteImg/{id}")
     public ResponseEntity<String> deleteImage(@PathVariable String id){
      imageService.deleteImage(id);
@@ -111,8 +108,6 @@ public class ImageController {
                 .contentType(MediaType.IMAGE_PNG)
                 .body(waterMarkedImage);
     }
-
-
     @PostMapping("/convertToJPG")
     public ResponseEntity<byte[]> convertToJPG(@RequestParam("file") MultipartFile file){
         byte[] JPGImg=imageService.convertToJPG(file);
@@ -163,7 +158,6 @@ public class ImageController {
                 .contentType(MediaType.IMAGE_JPEG)
                 .body(compressedImg);
     }
-
     @PostMapping("/blurImage")
     public ResponseEntity<byte[]> blurImage(@RequestParam("file") MultipartFile file) throws IOException{
         byte[] blurredImage=imageService.blurImage(file);
@@ -171,6 +165,5 @@ public class ImageController {
                 .contentType(MediaType.IMAGE_PNG)
                 .body(blurredImage);
     }
-
 }
 
