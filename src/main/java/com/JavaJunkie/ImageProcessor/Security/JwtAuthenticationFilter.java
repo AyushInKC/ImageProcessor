@@ -2,7 +2,6 @@ package com.JavaJunkie.ImageProcessor.Security;
 import com.JavaJunkie.ImageProcessor.Utils.JWTUtility;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,10 +12,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.util.Collections;
-
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -30,7 +27,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = request.getHeader("Authorization");
 
         if (token != null && token.startsWith("Bearer ")) {
-            token = token.substring(7);
+            token = token.substring(7).trim();
 
             try {
                 if (jwtUtility.validateToken(token, null)) {
@@ -47,6 +44,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             );
 
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                } else {
+                    logger.error("JWT validation failed.");
                 }
             } catch (Exception e) {
                 logger.error("JWT validation failed: ", e);
@@ -55,4 +54,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
+
 }
