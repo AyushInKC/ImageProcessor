@@ -34,7 +34,7 @@ import java.util.Optional;
 
 @Component
 @Service
-public class ImageService{
+public class ImageService {
     @Autowired
     private ImageRepository imageRepository;
 
@@ -50,7 +50,8 @@ public class ImageService{
         ImageEntity savedImage = imageRepository.save(image);
         return savedImage.getId();
     }
-    public byte[] getImageById(String id){
+
+    public byte[] getImageById(String id) {
         Optional<ImageEntity> imageOptional = imageRepository.findById(id);
         if (imageOptional.isPresent()) {
             return imageOptional.get().getImageData();
@@ -58,47 +59,47 @@ public class ImageService{
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Image not found");
         }
     }
+
     public ImageEntity getImageMetadataById(String id) {
         return imageRepository.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Image not found"));
     }
 
-    public void deleteImage(String id){
-         if(imageRepository.existsById(id)){
-                imageRepository.deleteById(id);
-                System.out.println("Image deleted Successfully!!!");
-         }
-         else{
-             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Image not found!!!");
-         }
+    public void deleteImage(String id) {
+        if (imageRepository.existsById(id)) {
+            imageRepository.deleteById(id);
+            System.out.println("Image deleted Successfully!!!");
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Image not found!!!");
+        }
     }
 
-    public ImageEntity updateImageData(String id, String newName, String newContentType){
-     Optional<ImageEntity> imageEntityOptional =imageRepository.findById(id);
-     if(imageEntityOptional.isPresent()){
-         ImageEntity image=imageEntityOptional.get();
-         image.setName(newName);
-         image.setContentType(newContentType);
-         return imageRepository.save(image);
-     }
-     else {
-         throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Image not Found!!!");
-     }
+    public ImageEntity updateImageData(String id, String newName, String newContentType) {
+        Optional<ImageEntity> imageEntityOptional = imageRepository.findById(id);
+        if (imageEntityOptional.isPresent()) {
+            ImageEntity image = imageEntityOptional.get();
+            image.setName(newName);
+            image.setContentType(newContentType);
+            return imageRepository.save(image);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Image not Found!!!");
+        }
     }
 
     public List<ImageEntity> getAllImages() {
         return imageRepository.findAll();
     }
+
     public boolean updateImageFile(String id, MultipartFile file) throws IOException {
-          ImageEntity existingImage=imageRepository.findById(id).orElse(null);
-          if(existingImage!=null){
-              existingImage.setName(file.getOriginalFilename());
-              existingImage.setContentType(file.getContentType());
-              existingImage.setImageData(file.getBytes());
-              imageRepository.save(existingImage);
-              return true;
-          }
-          return false;
+        ImageEntity existingImage = imageRepository.findById(id).orElse(null);
+        if (existingImage != null) {
+            existingImage.setName(file.getOriginalFilename());
+            existingImage.setContentType(file.getContentType());
+            existingImage.setImageData(file.getBytes());
+            imageRepository.save(existingImage);
+            return true;
+        }
+        return false;
     }
 
     public ResponseEntity<byte[]> resizeImage(MultipartFile file, int width, int height) throws IOException {
@@ -125,7 +126,8 @@ public class ImageService{
                 .contentType(MediaType.IMAGE_PNG)
                 .body(resizedImageBytes);
     }
-    public byte[] rotateImage(MultipartFile file, double angle) throws IOException{
+
+    public byte[] rotateImage(MultipartFile file, double angle) throws IOException {
         BufferedImage originalImage = ImageIO.read(file.getInputStream());
         int width = originalImage.getWidth();
         int height = originalImage.getHeight();
@@ -138,19 +140,19 @@ public class ImageService{
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ImageIO.write(rotatedImage, "PNG", baos);
         return baos.toByteArray();
-}
+    }
 
-public byte[] cropImage(MultipartFile file,int x,int y,int height,int width) throws IOException {
-    BufferedImage originalImage = ImageIO.read(file.getInputStream());
+    public byte[] cropImage(MultipartFile file, int x, int y, int height, int width) throws IOException {
+        BufferedImage originalImage = ImageIO.read(file.getInputStream());
 
-    BufferedImage croppedImage = originalImage.getSubimage(x, y, width, height);
+        BufferedImage croppedImage = originalImage.getSubimage(x, y, width, height);
 
-    System.out.println("Cropped Image Size: " + croppedImage.getWidth() + "x" + croppedImage.getHeight());
+        System.out.println("Cropped Image Size: " + croppedImage.getWidth() + "x" + croppedImage.getHeight());
 
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    ImageIO.write(croppedImage, "PNG", baos);
-    return baos.toByteArray();
-}
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(croppedImage, "PNG", baos);
+        return baos.toByteArray();
+    }
 
     public byte[] addWaterMark(MultipartFile file, String title) {
         try {
@@ -180,7 +182,8 @@ public byte[] cropImage(MultipartFile file,int x,int y,int height,int width) thr
     }
 
     public byte[] convertToJPG(MultipartFile file) {
-        try { String originalFilename = file.getOriginalFilename();
+        try {
+            String originalFilename = file.getOriginalFilename();
             String originalExtension = originalFilename != null ? originalFilename.substring(originalFilename.lastIndexOf(".") + 1) : "unknown";
 //            logger.info("Original file extension: " + originalExtension);
 //            System.out.println("Original file extension: " + originalExtension);
@@ -231,7 +234,7 @@ public byte[] cropImage(MultipartFile file,int x,int y,int height,int width) thr
         return baos.toByteArray();
     }
 
-    public byte[] addSepiaFilter(MultipartFile file)throws IOException {
+    public byte[] addSepiaFilter(MultipartFile file) throws IOException {
         BufferedImage originalImage = ImageIO.read(file.getInputStream());
 
         BufferedImage sepiaImage = new BufferedImage(originalImage.getWidth(), originalImage.getHeight(), BufferedImage.TYPE_INT_RGB);
@@ -285,7 +288,7 @@ public byte[] cropImage(MultipartFile file,int x,int y,int height,int width) thr
         return baos.toByteArray();
     }
 
-    public byte[] compressImage(MultipartFile file, float size) throws IOException{
+    public byte[] compressImage(MultipartFile file, float size) throws IOException {
         if (size < 0.0f || size > 1.0f) {
             throw new IllegalArgumentException("Quality must be between 0.0 and 1.0");
         }
@@ -308,7 +311,7 @@ public byte[] cropImage(MultipartFile file,int x,int y,int height,int width) thr
         return byteArrayOutputStream.toByteArray();
     }
 
-    public byte[] blurImage(MultipartFile file) throws IOException{
+    public byte[] blurImage(MultipartFile file) throws IOException {
         BufferedImage originalImage = ImageIO.read(new ByteArrayInputStream(file.getBytes()));
         float[] blurKernel = {
                 1f / 256f, 4f / 256f, 6f / 256f, 4f / 256f, 1f / 256f,
@@ -332,5 +335,38 @@ public byte[] cropImage(MultipartFile file,int x,int y,int height,int width) thr
         ImageIO.write(blurredImage, "png", outputStream);
 
         return outputStream.toByteArray();
+    }
+
+    public byte[] tintImage(MultipartFile file, String red, String green, String blue) {
+        try {
+            BufferedImage originalImage = ImageIO.read(file.getInputStream());
+
+            int r = Integer.parseInt(red);
+            int g = Integer.parseInt(green);
+            int b = Integer.parseInt(blue);
+
+            BufferedImage tintedImage = new BufferedImage(originalImage.getWidth(), originalImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
+
+            for (int x = 0; x < originalImage.getWidth(); x++) {
+                for (int y = 0; y < originalImage.getHeight(); y++) {
+
+                    Color originalColor = new Color(originalImage.getRGB(x, y), true);
+
+                    int redTinted = Math.min(255, originalColor.getRed() + r);
+                    int greenTinted = Math.min(255, originalColor.getGreen() + g);
+                    int blueTinted = Math.min(255, originalColor.getBlue() + b);
+
+                    Color tintedColor = new Color(redTinted, greenTinted, blueTinted, originalColor.getAlpha());
+                    tintedImage.setRGB(x, y, tintedColor.getRGB());
+                }
+            }
+
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            ImageIO.write(tintedImage, "png", outputStream);
+
+            return outputStream.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to process the image", e);
+        }
     }
 }
