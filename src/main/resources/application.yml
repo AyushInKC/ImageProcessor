@@ -1,4 +1,9 @@
+#spring:
+#  data:
+#    mongodb:
+#      uri: mongodb://localhost:27017/ImageProcessor
+
 spring:
   data:
     mongodb:
-      uri: mongodb://localhost:27017/ImageProcessor
+      uri: mongodb://host.docker.internal:27017/ImageProcessor
