@@ -6,7 +6,7 @@
 
 
 FROM openjdk:21-jdk AS build
-WORKDIR /quizApp
+WORKDIR /ImageProcessor
 COPY pom.xml .
 COPY src src
 
