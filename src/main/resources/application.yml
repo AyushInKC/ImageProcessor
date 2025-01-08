@@ -1,4 +1,7 @@
-spring:
-  data:
-    mongodb:
-      uri: mongodb://localhost:27017/ImageProcessor
+  spring:
+    data:
+      mongodb:
+        uri: mongodb+srv://sirfayush1008:Ayush%403344@cluster0.ngtgm.mongodb.net/ImageProcessor?retryWrites=true&w=majority
+
+
+
