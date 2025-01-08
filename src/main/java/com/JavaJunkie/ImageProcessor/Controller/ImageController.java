@@ -1,6 +1,8 @@
 package com.JavaJunkie.ImageProcessor.Controller;
 import com.JavaJunkie.ImageProcessor.Entity.ImageEntity;
 import com.JavaJunkie.ImageProcessor.Respository.ImageRepository;
+import com.JavaJunkie.ImageProcessor.Services.BackgroundRemovalService;
+import com.JavaJunkie.ImageProcessor.Services.BackgroundRemovalService;
 import com.JavaJunkie.ImageProcessor.Services.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -19,6 +21,10 @@ public class ImageController {
     private ImageService imageService;
     @Autowired
     private ImageRepository imageRepository;
+
+    @Autowired
+    private BackgroundRemovalService backgroundRemovalService;
+
     @PostMapping("/uploadImg")
     public ResponseEntity<?> uploadImage(@RequestParam("file") MultipartFile file) throws IOException {
         try {
@@ -171,6 +177,18 @@ public class ImageController {
                                            @RequestParam("g") String green,@RequestParam("b") String blue){
         byte[] tintedImage= imageService.tintImage(file,red,green,blue);
         return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(tintedImage);
+    }
+
+    @PostMapping(value = "/remove-background", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<byte[]> removeBackground(@RequestParam("file") MultipartFile file) {
+        try {
+            byte[] result = backgroundRemovalService.removeBackground(file);
+            return ResponseEntity.ok()
+                    .contentType(MediaType.IMAGE_PNG)
+                    .body(result);
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body(("Error: " + e.getMessage()).getBytes());
+        }
     }
 
 }

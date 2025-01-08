@@ -27,9 +27,9 @@
             http
                     .csrf(csrf -> csrf.disable())
                     .authorizeHttpRequests(auth -> auth
-                            .requestMatchers("/auth/**").permitAll()
-                            .requestMatchers("/img/**").authenticated()
-                            .anyRequest().permitAll()
+                            .requestMatchers("/auth/**","/img/**").permitAll()
+//                            .requestMatchers("/img/**").authenticated()
+                            .anyRequest().authenticated()
                     )
                     .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                     .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
