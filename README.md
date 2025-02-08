@@ -1,7 +1,7 @@
 Image Processing API Documentation
 Overview
 This API provides a set of endpoints for image upload, retrieval, and various image processing functionalities such as resizing, rotating, cropping, filtering, and background removal.
-Table of Contents https://roadmap.sh/projects/image-processing-service.
+Table of Contents 
 1. Image Upload and Retrieval
 2. Image Manipulation
 3. Background Removal
