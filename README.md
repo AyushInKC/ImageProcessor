@@ -1,7 +1,7 @@
 Image Processing API Documentation
 Overview
 This API provides a set of endpoints for image upload, retrieval, and various image processing functionalities such as resizing, rotating, cropping, filtering, and background removal.
-Table of Contents
+Table of Contents https://roadmap.sh/projects/image-processing-service.
 1. Image Upload and Retrieval
 2. Image Manipulation
 3. Background Removal
@@ -101,3 +101,5 @@ Error Handling
 401 Unauthorized - Invalid credentials during login.
 404 Not Found - Resource not found.
 500 Internal Server Error - Server error.
+
+
